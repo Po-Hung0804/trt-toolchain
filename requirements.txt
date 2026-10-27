@@ -1,0 +1,9 @@
+onnx
+onnxslim
+polygraphy
+nvidia-modelopt
+ultralytics
+timm
+pycocotools
+typer
+pandas
