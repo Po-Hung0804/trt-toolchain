@@ -7,3 +7,6 @@ timm
 pycocotools
 typer
 pandas
+nvidia-ml-py
+nvidia-ml-py
+onnxruntime
