@@ -1,6 +1,9 @@
 data/
-models/
-results/
+*.pt
 *.onnx
 *.engine
+models/timing.cache
+results/*_old.csv
+.home/
+.ultralytics/
 __pycache__/

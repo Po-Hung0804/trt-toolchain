@@ -1,0 +1,18 @@
+{
+  "engine": "models/yolo11n_fp16.engine",
+  "onnx": "models/yolo11n.onnx",
+  "precision": "fp16",
+  "imgsz": 640,
+  "input": "images",
+  "batch_profile": {
+    "min": 1,
+    "opt": 4,
+    "max": 8
+  },
+  "workspace_gb": 2.0,
+  "onnx_nodes": 805,
+  "engine_layers": 278,
+  "engine_mb": 6.91,
+  "build_seconds": 28.4,
+  "tensorrt": "10.15.1.29"
+}

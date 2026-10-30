@@ -25,10 +25,13 @@ def append_csv(path, row):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--model", default="yolo11n.pt")
+    p.add_argument("--model", default="yolo11n.pt", help=".pt weights or a TensorRT .engine")
+    p.add_argument("--precision", default="fp32", help="label for the CSV, e.g. fp32 / tf32 / fp16 / int8")
+    p.add_argument("--names-from", default="yolo11n.pt",
+                   help="weights to read class names from when --model is an engine without metadata")
     p.add_argument("--coco", default="data/coco", help="COCO root containing images/ and labels/")
     p.add_argument("--imgsz", type=int, default=640)
-    p.add_argument("--batch", type=int, default=16)
+    p.add_argument("--batch", type=int, default=8, help="must be within the engine's optimization profile")
     p.add_argument("--subset", type=int, default=0, help="0 = full val2017")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--out", default="results/baseline_accuracy.csv")
@@ -49,9 +52,14 @@ def main():
     else:
         val = img_dir
  
-    yolo = YOLO(args.model)
+    model_path = Path(args.model)
+    backend = {".engine": "tensorrt", ".onnx": "onnx"}.get(model_path.suffix, "pytorch")
  
-    # Minimal dataset yaml; class names come from the model itself (COCO's 80 classes).
+    yolo = YOLO(args.model, task="detect")
+    # Engines built by trtexec carry no Ultralytics metadata, so take names from the .pt weights.
+    names = yolo.names if backend == "pytorch" else YOLO(args.names_from).names
+ 
+    # Minimal dataset yaml; class names are COCO's 80 classes.
     data_yaml = work / "coco_val.yaml"
     data_yaml.write_text(
         yaml.safe_dump(
@@ -59,7 +67,7 @@ def main():
                 "path": str(root),
                 "train": str(val),  # required key, never used for validation
                 "val": str(val),
-                "names": yolo.names,
+                "names": names,
             },
             sort_keys=False,
         )
@@ -69,6 +77,10 @@ def main():
         data=str(data_yaml),
         imgsz=args.imgsz,
         batch=args.batch,
+        # Square 640x640 letterbox for every backend. PyTorch would otherwise use
+        # rectangular batches (e.g. 640x480), engines cannot, and the mAP gap would
+        # come from input shape rather than precision.
+        rect=False,
         device=0,
         plots=False,
         verbose=False,
@@ -77,10 +89,11 @@ def main():
     n_images = args.subset or len(list(img_dir.glob("*.jpg")))
     row = {
         "timestamp": datetime.now().isoformat(timespec="seconds"),
-        "model": Path(args.model).stem,
-        "backend": "pytorch",
-        "precision": "fp32",
+        "model": model_path.stem,
+        "backend": backend,
+        "precision": args.precision,
         "imgsz": args.imgsz,
+        "rect": False,
         "images": n_images,
         "seed": args.seed if args.subset else "",
         "map50_95": round(float(m.box.map), 4),
@@ -95,3 +108,4 @@ def main():
  
 if __name__ == "__main__":
     main()
+ 

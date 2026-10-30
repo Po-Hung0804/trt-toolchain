@@ -1,0 +1,70 @@
+{
+  "source": "yolo11n.pt",
+  "onnx": "models/yolo11n.onnx",
+  "size_mb": 10.2,
+  "imgsz": 640,
+  "opset": 17,
+  "exporter": "torchscript",
+  "input": {
+    "name": "images",
+    "shape": [
+      "batch",
+      3,
+      640,
+      640
+    ]
+  },
+  "output": {
+    "name": "output0",
+    "layout": "(batch, 4 box xywh px + classes, anchors)"
+  },
+  "torch": "2.11.0a0+eb65b36914.nv26.02",
+  "onnx_version": "1.18.0",
+  "nodes_before_slim": 682,
+  "nodes_after_slim": 328,
+  "op_types": {
+    "Conv": 88,
+    "Mul": 79,
+    "Sigmoid": 78,
+    "Concat": 21,
+    "Slice": 18,
+    "Add": 16,
+    "Reshape": 11,
+    "MaxPool": 3,
+    "Transpose": 3,
+    "Split": 2,
+    "MatMul": 2,
+    "Softmax": 2,
+    "Resize": 2,
+    "Sub": 2,
+    "Div": 1
+  },
+  "verify": [
+    {
+      "input": "real image, batch 1",
+      "shape": [
+        1,
+        84,
+        8400
+      ],
+      "box_max_abs_diff_px": 0.001709,
+      "cls_max_abs_diff": 2.293e-05,
+      "detections_pytorch": 52,
+      "detections_onnx": 52,
+      "pass": true
+    },
+    {
+      "input": "random, batch 4",
+      "shape": [
+        4,
+        84,
+        8400
+      ],
+      "box_max_abs_diff_px": 0.00293,
+      "cls_max_abs_diff": 2.5e-07,
+      "detections_pytorch": 0,
+      "detections_onnx": 0,
+      "pass": true
+    }
+  ]
+}
