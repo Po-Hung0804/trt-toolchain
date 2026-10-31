@@ -32,6 +32,12 @@ Needs WSL2, Docker and the NVIDIA Container Toolkit. Container: `nvcr.io/nvidia/
 ```bash
 docker build -t trt-toolchain:dev .
 
+./run.sh python scripts/pipeline.py                    # whole pipeline + summary table
+```
+
+Or run each step on its own:
+
+```bash
 ./run.sh python scripts/bench.py                       # PyTorch latency
 ./run.sh python scripts/eval.py                        # PyTorch mAP (needs COCO in data/coco)
 ./run.sh python scripts/export_onnx.py                 # ONNX export + numerical check
@@ -40,12 +46,12 @@ docker build -t trt-toolchain:dev .
 ./run.sh python scripts/eval.py --model models/yolo11n_fp16.engine --precision fp16
 ```
 
-Results go to `results/*.csv`; each export and build writes a JSON record to `models/`.
+Results go to `results/*.csv`, and `pipeline.py` writes a comparison table to `results/summary_*.md`. Each export and build writes a JSON record to `models/`.
 
 ## Roadmap
 
 - [x] PyTorch baseline, ONNX export, TensorRT TF32 / FP16
-- [ ] Single command for the whole pipeline
+- [x] Single command for the whole pipeline
 - [ ] INT8 with calibration and per-layer mixed precision
 - [ ] A Transformer model (Depth Anything V2 Small)
 - [ ] Nsight profiling, GPU pre-processing, CUDA Graphs
