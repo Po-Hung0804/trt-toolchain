@@ -2,3 +2,6 @@ timestamp,model,backend,precision,imgsz,rect,images,seed,map50_95,map50
 2026-10-30T03:33:18,yolo11n,pytorch,fp32,640,False,5000,,0.3878,0.545
 2026-10-30T03:34:17,yolo11n_tf32,tensorrt,tf32,640,False,5000,,0.3879,0.545
 2026-10-30T03:34:53,yolo11n_fp16,tensorrt,fp16,640,False,5000,,0.388,0.5449
+2026-10-31T00:00:28,yolo11n,pytorch,fp32,640,False,500,0,0.412,0.5605
+2026-10-31T00:02:43,yolo11n_tf32,tensorrt,tf32,640,False,500,0,0.4121,0.5604
+2026-10-31T00:04:04,yolo11n_fp16,tensorrt,fp16,640,False,500,0,0.4117,0.5606
